@@ -1,0 +1,44 @@
+tables
+
+STUDENT
+first name
+last name
+parent first name
+parent last name
+students' date of birth
+address
+email
+phone number
+gender
+
+COURSE
+Name
+
+YEAR_level
+Level
+
+
+ATTENDANCE
+student_id
+course_id
+level_id
+in
+out
+date
+description
+
+SCHOOL
+name
+address
+email
+website
+logo
+
+
+
+
+
+
+
+
+
