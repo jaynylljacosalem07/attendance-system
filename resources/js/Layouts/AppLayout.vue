@@ -46,7 +46,7 @@ const logout = () => {
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                                <Link :href="route('home.index')">
                                     <ApplicationMark class="block h-9 w-auto" />
                                 </Link>
                             </div>
@@ -56,8 +56,8 @@ const logout = () => {
                                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
                             >
                                 <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
+                                    :href="route('home.index')"
+                                    :active="route().current('home.index')"
                                 >
                                     Dashboard
                                 </NavLink>
@@ -65,7 +65,13 @@ const logout = () => {
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
                             >
-                                <NavLink>Attendance</NavLink>
+                                <NavLink
+                                    :href="route('attendance.index')"
+                                    :active="
+                                        route().current('attendance.index')
+                                    "
+                                    >Events</NavLink
+                                >
                             </div>
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"

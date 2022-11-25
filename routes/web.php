@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AttendanceSheetController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentsController;
 use Illuminate\Foundation\Application;
@@ -32,8 +34,12 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('Dashboard/Index');
     })->name('dashboard');
+
+    Route::prefix('home')->name('home.')->group(function() {
+        Route::get('/', [DashboardController::class, 'index'])->name('index');
+    });
 
     Route::prefix('settings')->name('settings.')->group(function() {
         Route::get('/', [SettingsController::class, 'index'])->name('index');
@@ -49,4 +55,14 @@ Route::middleware([
         Route::post('/update', [StudentsController::class, 'update'])->name('update');
         Route::post('/delete', [StudentsController::class, 'destroy'])->name('delete');
     });
+
+    Route::prefix('attendance')->name('attendance.')->group(function() {
+        Route::get('/', [AttendanceSheetController::class, 'index'])->name('index');
+        Route::post('/store', [AttendanceSheetController::class, 'store'])->name('store');
+        Route::post('/update', [AttendanceSheetController::class, 'update'])->name('update');
+        Route::post('/delete/{id}', [AttendanceSheetController::class, 'destroy'])->name('delete');
+    });
+
+
+
 });
