@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceSheetController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentsController;
 use Illuminate\Foundation\Application;
@@ -62,6 +63,10 @@ Route::middleware([
         Route::post('/store', [AttendanceSheetController::class, 'store'])->name('store');
         Route::post('/update', [AttendanceSheetController::class, 'update'])->name('update');
         Route::post('/delete/{id}', [AttendanceSheetController::class, 'destroy'])->name('delete');
+    });
+
+    Route::prefix('report')->name('report.')->group(function() {
+        Route::get('/{id}', [ReportsController::class, 'index'])->name('index');
     });
 
 

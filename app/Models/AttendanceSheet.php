@@ -13,5 +13,16 @@ class AttendanceSheet extends Model
         'in' => 'array',
         'out' => 'array',
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    { 
+        return $this->belongsTo(User::class,'id_number','id_number');
+    }
+
+    public function course(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    { 
+        return $this->belongsTo(Course::class);
+    }
+
     
 }

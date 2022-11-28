@@ -15,4 +15,9 @@ class Event extends Model
         'course_id' => 'array',
         'year_level' => 'array',
     ];
+
+    public function sheets(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AttendanceSheet::class, 'event_id', 'id');
+    }
 }

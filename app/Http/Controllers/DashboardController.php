@@ -88,6 +88,12 @@ class DashboardController extends Controller
         // Add fields and errors
       
         $student = User::where("id_number",$request->id_number)->first();
+
+        if($student == null){
+            $validator->errors()->add('message', 'Student ID not found. Please try again. Thank you.');
+            throw new \Illuminate\Validation\ValidationException($validator);
+        }
+
         
         $check = AttendanceSheet::where([
             "id_number" => $request->id_number,
@@ -103,8 +109,7 @@ class DashboardController extends Controller
                 $array_str = [$request->mode => $tmp];
             }else{
                 
-                $tmp =  $check->out;
-                // dd(array_key_exists($request->index, $tmp));
+                $tmp =  $check[$request->mode];
                 if(array_key_exists($request->index, $tmp) === false)
                     $tmp[$request->index] = '';
                 if(strlen($tmp[$request->index]) > 0)
@@ -122,6 +127,7 @@ class DashboardController extends Controller
             $check->update($array_str);
 
         }else{
+          
             $tmp = array_fill(0,  $request->index+1, '');
             $tmp[$request->index] = $request->time;
             AttendanceSheet::create([

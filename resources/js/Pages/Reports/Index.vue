@@ -11,24 +11,7 @@ import moment from "moment";
 import { reactive, ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
 
-const props = defineProps(["sheets", "course"]);
-const show_add_dialog = ref(false);
-const edit_student = ref(false);
-const confirm_delete = ref(false);
-const delete_entries = ref({
-    in: [],
-    out: [],
-});
-const form = useForm({
-    id: "",
-    name: "",
-    start_time: [],
-    start_date: Date,
-    end_time: [],
-    end_date: Date,
-    course: [],
-    year_level: [],
-});
+const props = defineProps(["data", "event"]);
 
 const year_levels = reactive([
     { label: "1st Year", value: 1 },
@@ -36,91 +19,15 @@ const year_levels = reactive([
     { label: "3rd Year", value: 3 },
     { label: "4th Year", value: 4 },
 ]);
-// const year_levels = reactive(["1st Year", "2nd Year", "3rd Year", "4th Year"]);
-const addStudent = () => {
-    let str_route = edit_student.value
-        ? "attendance.update"
-        : "attendance.store";
-    form.post(route(str_route), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            alert(
-                `Event successfully ${edit_student.value ? "updated" : "added"}`
-            );
-            if (edit_student.value) edit_student.value = !edit_student.value;
-            show_add_dialog.value = false;
-            form.reset();
-        },
-        onError: (e) => {
-            console.log(e);
-        },
-    });
-};
-
-const showEditStudent = (student) => {
-    edit_student.value = true;
-
-    form.id = student.id;
-    form.name = student.name;
-    form.start_time = student.start_time;
-    form.end_time = student.end_time;
-    form.course = student.course_id;
-    form.year_level = student.year_level;
-
-    show_add_dialog.value = true;
-    console.log(student);
-};
-const showConfirmModal = (student) => {
-    confirm_delete.value = true;
-    form.id = student.id;
-};
-const confirmDelete = () => {
-    form.post(route("attendance.delete", { id: form.id }), {
-        preserveScroll: true,
-        errorBag: "deleteStudent",
-        onSuccess: () => {
-            alert(`Event successfully closed`);
-            confirm_delete.value = false;
-            form.reset();
-        },
-        onError: (e) => {
-            console.log(e);
-        },
-    });
-};
-
-const removeTime = (t) => {
-    switch (t) {
-        case "start_time":
-            delete_entries.value.in.forEach((element, key) => {
-                console.log(element, key);
-                if (element == true) form.start_time.splice(key, 1);
-            });
-            break;
-        case "end_time":
-            delete_entries.value.out.forEach((element, key) => {
-                console.log(element, key);
-                if (element == true) form.end_time.splice(key, 1);
-            });
-            break;
-    }
-};
 </script>
 <template>
-    <AppLayout title="Students">
+    <AppLayout title="Reports">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Attendance
+                Reports
             </h2>
         </template>
         <div class="py-12">
-            <button
-                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                @click="show_add_dialog = true"
-            >
-                Add Events
-            </button>
             <div class="mt-1 overflow-hidden bg-white mb-2">
                 <div class="c overflow-auto">
                     <table
@@ -133,158 +40,96 @@ const removeTime = (t) => {
                                 <th
                                     class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
                                 >
-                                    Event Name
+                                    No.
                                 </th>
                                 <th
                                     class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
                                 >
-                                    Starting Date
+                                    Name
                                 </th>
                                 <th
                                     class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
                                 >
-                                    End Date
+                                    Course
                                 </th>
                                 <th
                                     class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
                                 >
-                                    Status
+                                    Year Level
                                 </th>
+                                <template
+                                    v-for="(st, st_index) in event.start_time"
+                                    :key="st_index"
+                                >
+                                    <th
+                                        class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    >
+                                        In #{{ st_index + 1 }}
+                                    </th>
 
-                                <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
-                                >
-                                    Actions
-                                </th>
+                                    <th
+                                        class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    >
+                                        Out #{{ st_index + 1 }}
+                                    </th>
+                                </template>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr
-                                v-for="(student, index) in props.sheets.data"
+                                v-for="(d, index) in data"
                                 :key="index"
                                 class="hover:bg-gray-100"
                             >
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
-                                    {{ student.name }}
+                                    {{ index + 1 }}
                                 </td>
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
-                                    <p
-                                        v-for="(
-                                            st, st_index
-                                        ) in student.start_time"
-                                        :key="st_index"
-                                    >
-                                        {{
-                                            `${st_index + 1}.)  ${moment(
-                                                new Date(st)
-                                            ).format("LLLL")}`
-                                        }}
-                                    </p>
+                                    {{ d.user.name }}
                                 </td>
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
-                                    <p
-                                        v-for="(
-                                            st, st_index
-                                        ) in student.end_time"
-                                        :key="st_index"
-                                    >
-                                        {{
-                                            `${st_index + 1}.)  ${moment(
-                                                new Date(st)
-                                            ).format("LLLL")}`
-                                        }}
-                                    </p>
+                                    {{ d.course.name }}
                                 </td>
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
                                     {{
-                                        student.status == null
-                                            ? "Open"
-                                            : "Close"
+                                        year_levels.find((o) => {
+                                            return o.value == d.year_level_id;
+                                        }).label
                                     }}
                                 </td>
-
-                                <td>
-                                    <button
-                                        @click="showEditStudent(student)"
-                                        title="Edit"
+                                <template
+                                    v-for="(st, st_index) in d.in"
+                                    :key="st_index"
+                                >
+                                    <td
+                                        class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            data-v-0e807ea5=""
-                                        >
-                                            <path
-                                                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                                                clip-rule="evenodd"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                        </svg>
-                                    </button>
-                                    <button
-                                        @click="showConfirmModal(student)"
-                                        title="Close"
+                                        {{
+                                            moment(new Date(st)).format("LLLL")
+                                        }}
+                                    </td>
+                                    <td
+                                        class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            data-v-0e807ea5=""
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                                clip-rule="evenodd"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                        </svg>
-                                    </button>
-                                    <button>
-                                        <a
-                                            title="Reports"
-                                            :href="
-                                                route(
-                                                    'report.index',
-                                                    student.id
-                                                )
-                                            "
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-4 w-5"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                stroke-width="2"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                                                />
-                                            </svg>
-                                        </a>
-                                    </button>
-                                </td>
+                                        {{
+                                            moment(
+                                                new Date(d.out[st_index])
+                                            ).format("LLLL")
+                                        }}
+                                    </td>
+                                </template>
                             </tr>
                             <tr>
                                 <td
-                                    v-if="props.sheets.data.length === 0"
+                                    v-if="data.length === 0"
                                     colspan="5"
                                     class="uppercase py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap text-center"
                                 >
