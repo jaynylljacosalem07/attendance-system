@@ -87,7 +87,7 @@ onMounted(() => {
                             </div>
                         </div>
 
-                       More products... -->
+                       More products... 
                     </div>
                 </div> -->
             </div>
