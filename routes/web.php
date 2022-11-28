@@ -39,6 +39,7 @@ Route::middleware([
 
     Route::prefix('home')->name('home.')->group(function() {
         Route::get('/', [DashboardController::class, 'index'])->name('index');
+        Route::post('/update', [DashboardController::class, 'update'])->name('update');
     });
 
     Route::prefix('settings')->name('settings.')->group(function() {

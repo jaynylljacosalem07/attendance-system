@@ -7,12 +7,14 @@ import moment from "moment";
 // import "vue-toastification/dist/index.css";
 import { QrcodeStream } from "vue3-qrcode-reader";
 import { onMounted, ref } from "vue";
+import { useForm } from "@inertiajs/inertia-vue3";
 
 const props = defineProps({
     events: Object,
 });
 
 const show_scanner = ref(false);
+const hide_scanner = ref(false);
 const data = ref([
     {
         name: "test",
@@ -24,6 +26,16 @@ const data = ref([
         name: "test",
     },
 ]);
+
+const scanner_status = ref("Scanning...");
+
+const form = useForm({
+    mode: "",
+    index: "",
+    id: "",
+    id_number: "",
+    time: "",
+});
 // const toast = useToast({
 //     position: "bottom-left",
 //     timeout: 1500,
@@ -31,8 +43,42 @@ const data = ref([
 const onInit = () => {};
 
 const onDecode = (decodedString) => {
-    console.log(decodedString);
+    if (decodedString.trim().length > 0) {
+        form.id_number = decodedString;
+        form.time = new Date();
+        submitForm();
+    }
 };
+
+const submitForm = () => {
+    scanner_status.value = "Saving entry...";
+    form.post(route("home.update"), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            scanner_status.value = "Entry Recorded!";
+            setTimeout(() => {
+                scanner_status.value = "Scanning";
+                form.reset();
+            }, 1500);
+        },
+        onError: (e) => {
+            console.log(e);
+            scanner_status.value = e.message;
+            setTimeout(() => {
+                scanner_status.value = "Scanning";
+            }, 2000);
+        },
+    });
+};
+
+const showScanner = (mode, index, id) => {
+    form.mode = mode;
+    form.index = index;
+    form.id = id;
+    show_scanner.value = true;
+};
+
 onMounted(() => {
     // toast("test");
 });
@@ -87,7 +133,7 @@ onMounted(() => {
                             </div>
                         </div>
 
-                       More products... 
+                     More products...
                     </div>
                 </div> -->
             </div>
@@ -126,17 +172,29 @@ onMounted(() => {
                                                 Check in
                                             </div>
                                             <div
-                                                v-for="(
-                                                    st, st_index
-                                                ) in d.start_time"
-                                                :key="st_index"
                                                 class="col-span-3 text-sm text-gray-600 pt-2 pb-3"
                                             >
-                                                {{
-                                                    moment(new Date(st)).format(
-                                                        "LLLL"
-                                                    )
-                                                }}
+                                                <a
+                                                    @click="
+                                                        showScanner(
+                                                            'in',
+                                                            st_index,
+                                                            d.id
+                                                        )
+                                                    "
+                                                    href="javascript:;"
+                                                    class="text-sm text-blue-400 mr-2 inline-flex items-center"
+                                                    v-for="(
+                                                        st, st_index
+                                                    ) in d.start_time"
+                                                    :key="st_index"
+                                                >
+                                                    {{
+                                                        moment(
+                                                            new Date(st)
+                                                        ).format("LLL")
+                                                    }}
+                                                </a>
                                             </div>
                                             <div class="text-xs text-gray-500">
                                                 Check out
@@ -144,15 +202,31 @@ onMounted(() => {
                                             <div
                                                 class="col-span-3 text-sm text-gray-600 pt-2 pb-3"
                                             >
-                                                {{
-                                                    moment(
-                                                        new Date(d.end_time)
-                                                    ).format("LLLL")
-                                                }}
+                                                <a
+                                                    @click="
+                                                        showScanner(
+                                                            'out',
+                                                            st_index,
+                                                            d.id
+                                                        )
+                                                    "
+                                                    href="javascript:;"
+                                                    class="text-sm text-blue-400 mr-2 inline-flex items-center"
+                                                    v-for="(
+                                                        st, st_index
+                                                    ) in d.end_time"
+                                                    :key="st_index"
+                                                >
+                                                    {{
+                                                        moment(
+                                                            new Date(st)
+                                                        ).format("LLL")
+                                                    }}
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                    <div
+                                    <!-- <div
                                         class="border-t border-gray-300 p-2 mt-auto"
                                     >
                                         <a
@@ -168,7 +242,7 @@ onMounted(() => {
                                         >
                                             Check out
                                         </a>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -178,7 +252,7 @@ onMounted(() => {
         </div>
     </AppLayout>
     <JetModal :show="show_scanner">
-        <template #title>QR Scanner</template>
+        <template #title>{{ scanner_status }}</template>
         <template #content>
             <qrcode-stream
                 @init="onInit"

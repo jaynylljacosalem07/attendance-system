@@ -9,5 +9,9 @@ class AttendanceSheet extends Model
 {
     use HasFactory;
     protected $guarded= [];
+    protected $casts = [
+        'in' => 'array',
+        'out' => 'array',
+    ];
     
 }
