@@ -46,7 +46,7 @@ onMounted(() => {
         </template>
         <div class="sm:rounded-md">
             <div class="bg-white">
-                <div
+                <!-- <div
                     class="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8"
                 >
                     <h2 class="text-2xl font-bold tracking-tight text-gray-900">
@@ -89,7 +89,7 @@ onMounted(() => {
 
                         <!-- More products... -->
                     </div>
-                </div>
+                </div> -->
             </div>
             <div style="">
                 <div class="flex flex-col px-4">
