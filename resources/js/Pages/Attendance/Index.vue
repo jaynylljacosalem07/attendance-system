@@ -7,18 +7,27 @@ import JetSecondaryButton from "@/Components/SecondaryButton.vue";
 import JetInputError from "@/Components/InputError.vue";
 import JetConfirmModal from "@/Components/ConfirmationModal.vue";
 import Multiselect from "@vueform/multiselect";
+import moment from "moment";
 import { reactive, ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
 
-const props = defineProps(["sheets"]);
+const props = defineProps(["sheets", "course"]);
 const show_add_dialog = ref(false);
 const edit_student = ref(false);
 const confirm_delete = ref(false);
+const delete_entries = ref({
+    in: [],
+    out: [],
+});
 const form = useForm({
     id: "",
     name: "",
-    start_time: "",
-    end_time: "",
+    start_time: [],
+    start_date: Date,
+    end_time: [],
+    end_date: Date,
+    course: [],
+    year_level: [],
 });
 
 const year_levels = reactive([
@@ -56,6 +65,8 @@ const showEditStudent = (student) => {
     form.name = student.name;
     form.start_time = student.start_time;
     form.end_time = student.end_time;
+    form.course = student.course_id;
+    form.year_level = student.year_level;
 
     show_add_dialog.value = true;
     console.log(student);
@@ -77,6 +88,23 @@ const confirmDelete = () => {
             console.log(e);
         },
     });
+};
+
+const removeTime = (t) => {
+    switch (t) {
+        case "start_time":
+            delete_entries.value.in.forEach((element, key) => {
+                console.log(element, key);
+                if (element == true) form.start_time.splice(key, 1);
+            });
+            break;
+        case "end_time":
+            delete_entries.value.out.forEach((element, key) => {
+                console.log(element, key);
+                if (element == true) form.end_time.splice(key, 1);
+            });
+            break;
+    }
 };
 </script>
 <template>
@@ -144,12 +172,34 @@ const confirmDelete = () => {
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
-                                    {{ student.start_time }}
+                                    <p
+                                        v-for="(
+                                            st, st_index
+                                        ) in student.start_time"
+                                        :key="st_index"
+                                    >
+                                        {{
+                                            `${st_index + 1}.)  ${moment(
+                                                new Date(st)
+                                            ).format("LLLL")}`
+                                        }}
+                                    </p>
                                 </td>
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
-                                    {{ student.end_time }}
+                                    <p
+                                        v-for="(
+                                            st, st_index
+                                        ) in student.end_time"
+                                        :key="st_index"
+                                    >
+                                        {{
+                                            `${st_index + 1}.)  ${moment(
+                                                new Date(st)
+                                            ).format("LLLL")}`
+                                        }}
+                                    </p>
                                 </td>
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
@@ -222,7 +272,7 @@ const confirmDelete = () => {
     >
         <template #title>Add Event</template>
         <template #content>
-            <div class="shadow sm:overflow-hidden sm:rounded-md">
+            <div class="shadow sm:rounded-md sm:rounded-md">
                 <div class="space-y-6 bg-white px-4 py-5 sm:p-6">
                     <div>
                         <label
@@ -247,15 +297,67 @@ const confirmDelete = () => {
                         <label
                             for="start"
                             class="block text-sm font-medium text-gray-700"
-                            >Start Date</label
+                            >Time in</label
                         >
                         <input
-                            v-model="form.start_time"
                             type="datetime-local"
                             name="start"
                             id="start"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            v-model="form.start_date"
                         />
+                        <button
+                            @click="form.start_time.push(form.start_date)"
+                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Add
+                        </button>
+                        <button
+                            @click="removeTime('start_time')"
+                            class="ml-1 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Delete
+                        </button>
+                        <div class="space-y-6 bg-white px-4 py-5 sm:p-6">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-500">
+                                    Time in
+                                </h3>
+                                <div class="mt-4 space-y-4">
+                                    <div
+                                        v-for="(
+                                            ti, ti_index
+                                        ) in form.start_time"
+                                        :key="ti_index"
+                                        class="flex items-start"
+                                    >
+                                        <div class="flex h-5 items-center">
+                                            <input
+                                                v-model="
+                                                    delete_entries.in[ti_index]
+                                                "
+                                                id="start_date"
+                                                name="start_date"
+                                                type="checkbox"
+                                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                            />
+                                        </div>
+                                        <div class="ml-3 text-sm">
+                                            <label
+                                                for="comments"
+                                                class="font-medium text-gray-700"
+                                            >
+                                                {{
+                                                    moment(new Date(ti)).format(
+                                                        "LLLL"
+                                                    )
+                                                }}</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <JetInputError
                             :message="form.errors.addStudents?.start_time"
                             class="mt-2"
@@ -265,17 +367,100 @@ const confirmDelete = () => {
                         <label
                             for="end"
                             class="block text-sm font-medium text-gray-700"
-                            >End Date</label
+                            >Time out</label
                         >
                         <input
-                            v-model="form.end_time"
                             type="datetime-local"
                             name="end"
                             id="end"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            v-model="form.end_date"
                         />
+                        <button
+                            @click="form.end_time.push(form.end_date)"
+                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Add
+                        </button>
+                        <button
+                            @click="removeTime('end_time')"
+                            class="ml-1 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Delete
+                        </button>
+                        <div class="space-y-6 bg-white px-4 py-5 sm:p-6">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-500">
+                                    Time out
+                                </h3>
+                                <div class="mt-4 space-y-4">
+                                    <div
+                                        v-for="(ti, ti_index) in form.end_time"
+                                        :key="ti_index"
+                                        class="flex items-start"
+                                    >
+                                        <div class="flex h-5 items-center">
+                                            <input
+                                                v-model="
+                                                    delete_entries.out[ti_index]
+                                                "
+                                                id="end_time"
+                                                name="end_time"
+                                                type="checkbox"
+                                                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                            />
+                                        </div>
+                                        <div class="ml-3 text-sm">
+                                            <label
+                                                for="comments"
+                                                class="font-medium text-gray-700"
+                                            >
+                                                {{
+                                                    moment(new Date(ti)).format(
+                                                        "LLLL"
+                                                    )
+                                                }}</label
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <JetInputError
                             :message="form.errors.addStudents?.end_time"
+                            class="mt-2"
+                        />
+                    </div>
+                    <div>
+                        <label
+                            for="course"
+                            class="block text-sm font-medium text-gray-700"
+                            >Course</label
+                        >
+                        <multiselect
+                            mode="tags"
+                            v-model="form.course"
+                            :options="
+                                course.map((o) => {
+                                    return { label: o.name, value: o.id };
+                                })
+                            "
+                        ></multiselect>
+
+                        <!-- <select
+                            v-model="form.year_levels"
+                            name="year_levels"
+                            id="year_levels"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        >
+                            <option selected value="0">All</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select> -->
+                        <JetInputError
+                            :message="form.errors.addStudents?.year_levels"
                             class="mt-2"
                         />
                     </div>
@@ -286,9 +471,9 @@ const confirmDelete = () => {
                             >Year Level</label
                         >
                         <multiselect
-                            mode="multiple"
+                            mode="tags"
                             :close-on-select="false"
-                            v-model="form.year_levels"
+                            v-model="form.year_level"
                             :options="year_levels"
                         ></multiselect>
 

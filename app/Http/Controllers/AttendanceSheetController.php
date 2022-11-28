@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttendanceSheet;
+use App\Models\Course;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -18,7 +19,10 @@ class AttendanceSheetController extends Controller
     public function index()
     {
         return Inertia::render('Attendance/Index',[
-            "sheets" => Event::paginate(10)
+            "sheets" => Event::paginate(10),
+            "course" => Course::all()
+
+
         ]);
     }
 
@@ -45,13 +49,17 @@ class AttendanceSheetController extends Controller
             'name' => 'required',
             'start_time' => 'required',
             'end_time' => 'required',
+            'course' => 'required',
+            'year_level' => 'required',
          
          ]);
-      
+        //  dd($request);
          $user = Event::create([
             'name' => $request->name,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
+            'start_time' => ($request->start_time),
+            'end_time' => ($request->end_time),
+            'course_id' => ($request->course),
+            'year_level' => ($request->year_level),
             'created_by' => auth()->id()
          ]);
  
@@ -97,6 +105,8 @@ class AttendanceSheetController extends Controller
             'name' => 'required',
             'start_time' => 'required',
             'end_time' => 'required',
+            'course' => 'required',
+            'year_level' =>'required',
          
          ]);
 
@@ -105,6 +115,8 @@ class AttendanceSheetController extends Controller
             'name' => $request->name,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
+            'course_id' => $request->course,
+            'year_level' => $request->year_level,
             
             
          ]);

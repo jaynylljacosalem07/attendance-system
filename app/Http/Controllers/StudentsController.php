@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\Team;
 use App\Models\User;
 use Inertia\Inertia;
@@ -20,7 +21,8 @@ class StudentsController extends Controller
     {
         //
         return Inertia::render('Students/Index',[
-            "students" => User::whereNull('role')->paginate(10)
+            "students" => User::whereNull('role')->paginate(10),
+            "course" => Course::all()
         ]);
 
     }
@@ -44,6 +46,7 @@ class StudentsController extends Controller
     public function store(Request $request)
     {
         //
+        // dd($request->course);
         $request->validateWithBag('addStudents', [
             'name' => 'required',
             'password' => 'required|confirmed',
@@ -53,6 +56,8 @@ class StudentsController extends Controller
             'address' => 'required',
             'gender' => 'required',
             'phone_number' => 'required',
+            'course' => 'required',
+            'year_level' => 'required',
          
          ]);
  
@@ -65,6 +70,9 @@ class StudentsController extends Controller
              'address' => strip_tags($request->address),
              'gender' => strip_tags($request->gender),
              'phone_number' => $request->phone_number,
+             'course_id' => $request->course,
+             'year_level' =>(int) $request->year_level,
+             'id_number' => $this->addIdNumber(User::count()+1)
          ]);
  
          $user->ownedTeams()->save(Team::forceCreate([
@@ -74,6 +82,17 @@ class StudentsController extends Controller
          ]));
 
          return Redirect::back();
+    }
+
+    /**
+     * add zeros to id number
+     * 
+     */
+    private function addIdNumber($id)
+    {
+        $len = strlen($id);
+        return str_repeat("0",8-$len) . $id;
+
     }
 
     /**
@@ -114,6 +133,8 @@ class StudentsController extends Controller
             'address' => 'required',
             'gender' => 'required',
             'phone_number' => 'required',
+            'course' => 'required',
+            'year_level' => 'required',
          
          ]);
          $user = User::find($request->id);
@@ -124,6 +145,8 @@ class StudentsController extends Controller
              'address' => strip_tags($request->address),
              'gender' => strip_tags($request->gender),
              'phone_number' => $request->phone_number,
+             'course_id' => $request->course,
+             'year_level' => (int) $request->year_level,
          ]);
          return Redirect::back();
     }

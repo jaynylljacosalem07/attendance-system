@@ -9,7 +9,7 @@ import JetConfirmModal from "@/Components/ConfirmationModal.vue";
 import { ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
 
-const props = defineProps(["students"]);
+const props = defineProps(["students", "course"]);
 const show_add_dialog = ref(false);
 const edit_student = ref(false);
 const confirm_delete = ref(false);
@@ -24,6 +24,8 @@ const form = useForm({
     gender: "",
     password: "",
     password_confirmation: "",
+    course: "",
+    year_level: "",
 });
 
 const addStudent = () => {
@@ -57,6 +59,8 @@ const showEditStudent = (student) => {
     form.address = student.address;
     form.phone_number = student.phone_number;
     form.gender = student.gender;
+    form.course = student.course_id;
+    form.year_level = student.year_level;
     show_add_dialog.value = true;
     console.log(student);
 };
@@ -105,6 +109,11 @@ const confirmDelete = () => {
                                 <th
                                     class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
                                 >
+                                    ID Number
+                                </th>
+                                <th
+                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                >
                                     Name
                                 </th>
                                 <th
@@ -135,6 +144,11 @@ const confirmDelete = () => {
                                 :key="index"
                                 class="hover:bg-gray-100"
                             >
+                                <td
+                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                >
+                                    {{ student.id_number }}
+                                </td>
                                 <td
                                     class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
                                 >
@@ -256,6 +270,53 @@ const confirmDelete = () => {
                             class="mt-2"
                         />
                     </div>
+                    <div>
+                        <label
+                            for="gender"
+                            class="block text-sm font-medium text-gray-700"
+                            >Course</label
+                        >
+                        <select
+                            v-model="form.course"
+                            name="gender"
+                            id="gender"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        >
+                            <option
+                                v-for="(c, c_index) in course"
+                                :key="c_index"
+                                :value="c.id"
+                            >
+                                {{ c.name }}
+                            </option>
+                        </select>
+                        <JetInputError
+                            :message="form.errors.addStudents?.course"
+                            class="mt-2"
+                        />
+                    </div>
+                    <div>
+                        <label
+                            for="gender"
+                            class="block text-sm font-medium text-gray-700"
+                            >Year</label
+                        >
+                        <select
+                            v-model="form.year_level"
+                            name="gender"
+                            id="gender"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        >
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                        <JetInputError
+                            :message="form.errors.addStudents?.year_level"
+                            class="mt-2"
+                        />
+                    </div>
                     <div v-if="!edit_student">
                         <label
                             for="email"
@@ -310,24 +371,7 @@ const confirmDelete = () => {
                             class="mt-2"
                         />
                     </div>
-                    <div>
-                        <label
-                            for="phone_number"
-                            class="block text-sm font-medium text-gray-700"
-                            >Contact Number</label
-                        >
-                        <input
-                            v-model="form.phone_number"
-                            type="number"
-                            name="phone_number"
-                            id="phone_number"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        />
-                        <JetInputError
-                            :message="form.errors.addStudents?.phone_number"
-                            class="mt-2"
-                        />
-                    </div>
+
                     <div>
                         <label
                             for="parent_name"
@@ -343,6 +387,24 @@ const confirmDelete = () => {
                         />
                         <JetInputError
                             :message="form.errors.addStudents?.parent_name"
+                            class="mt-2"
+                        />
+                    </div>
+                    <div>
+                        <label
+                            for="phone_number"
+                            class="block text-sm font-medium text-gray-700"
+                            >Contact Number</label
+                        >
+                        <input
+                            v-model="form.phone_number"
+                            type="number"
+                            name="phone_number"
+                            id="phone_number"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                        <JetInputError
+                            :message="form.errors.addStudents?.phone_number"
                             class="mt-2"
                         />
                     </div>
