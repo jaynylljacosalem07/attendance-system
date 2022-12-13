@@ -145,6 +145,91 @@ onMounted(() => {
                                 class="mt-2 grid grid-cols-3 grid-cols-3 gap-3 c overflow-y-auto overflow-x-hidden"
                             >
                                 <div
+                                    class="flex justify-center"
+                                    v-for="(d, index) in events.data"
+                                    :key="index"
+                                >
+                                    <div
+                                        class="block rounded-lg shadow-lg bg-white max-w-sm text-center"
+                                    >
+                                        <div
+                                            class="py-3 px-6 border-b border-gray-300"
+                                        >
+                                            {{ d.name }}
+                                        </div>
+                                        <div class="p-6">
+                                            <h5
+                                                class="text-gray-900 text-xl font-medium mb-2"
+                                            ></h5>
+                                            <p
+                                                class="text-gray-700 text-base mb-4"
+                                            >
+                                                Check in
+                                            </p>
+
+                                            <div
+                                                class="flex flex-wrap justify-center space-x-2"
+                                            >
+                                                <a
+                                                    @click="
+                                                        showScanner(
+                                                            'in',
+                                                            st_index,
+                                                            d.id
+                                                        )
+                                                    "
+                                                    href="javascript:;"
+                                                    v-for="(
+                                                        st, st_index
+                                                    ) in d.start_time"
+                                                    :key="st_index"
+                                                    class="mb-1 px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease"
+                                                >
+                                                    {{
+                                                        moment(
+                                                            new Date(st)
+                                                        ).format("LLL")
+                                                    }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="py-3 px-6 border-t border-gray-300 text-gray-600"
+                                        >
+                                            <p
+                                                class="text-gray-700 text-base mb-4"
+                                            >
+                                                Check out
+                                            </p>
+                                            <div
+                                                class="flex flex-wrap justify-center space-x-2"
+                                            >
+                                                <a
+                                                    @click="
+                                                        showScanner(
+                                                            'out',
+                                                            st_index,
+                                                            d.id
+                                                        )
+                                                    "
+                                                    href="javascript:;"
+                                                    v-for="(
+                                                        st, st_index
+                                                    ) in d.end_time"
+                                                    :key="st_index"
+                                                    class="mb-1 px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease"
+                                                >
+                                                    {{
+                                                        moment(
+                                                            new Date(st)
+                                                        ).format("LLL")
+                                                    }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div
                                     v-for="(d, index) in events.data"
                                     :key="index"
                                     class="bg-white shadow border-gray-300 border flex flex-col col-span-1 rounded-xl m-2 md:col-span-1 col-span-3"
@@ -177,7 +262,7 @@ onMounted(() => {
                                                 <a
                                                     @click="
                                                         showScanner(
-                                                            'in',
+                                                            'out',
                                                             st_index,
                                                             d.id
                                                         )
@@ -186,7 +271,7 @@ onMounted(() => {
                                                     class="text-sm text-blue-400 mr-2 inline-flex items-center"
                                                     v-for="(
                                                         st, st_index
-                                                    ) in d.start_time"
+                                                    ) in d.end_time"
                                                     :key="st_index"
                                                 >
                                                     {{
@@ -226,7 +311,7 @@ onMounted(() => {
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- <div
+                                    <div
                                         class="border-t border-gray-300 p-2 mt-auto"
                                     >
                                         <a
@@ -242,8 +327,8 @@ onMounted(() => {
                                         >
                                             Check out
                                         </a>
-                                    </div> -->
-                                </div>
+                                    </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>

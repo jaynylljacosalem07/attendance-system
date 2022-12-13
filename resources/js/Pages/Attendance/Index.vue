@@ -7,9 +7,20 @@ import JetSecondaryButton from "@/Components/SecondaryButton.vue";
 import JetInputError from "@/Components/InputError.vue";
 import JetConfirmModal from "@/Components/ConfirmationModal.vue";
 import Multiselect from "@vueform/multiselect";
+import { useToast } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 import moment from "moment";
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
+import exportFromJSON from "export-from-json";
+
+const toast = useToast({
+    position: "bottom-right",
+    timeout: 1500,
+});
+const data = [{ foo: "foo" }, { bar: "bar" }];
+const fileName = "download";
+const exportType = exportFromJSON.types.csv;
 
 const props = defineProps(["sheets", "course"]);
 const show_add_dialog = ref(false);
@@ -19,6 +30,7 @@ const delete_entries = ref({
     in: [],
     out: [],
 });
+
 const form = useForm({
     id: "",
     name: "",
@@ -45,7 +57,7 @@ const addStudent = () => {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
-            alert(
+            toast(
                 `Event successfully ${edit_student.value ? "updated" : "added"}`
             );
             if (edit_student.value) edit_student.value = !edit_student.value;
@@ -80,7 +92,7 @@ const confirmDelete = () => {
         preserveScroll: true,
         errorBag: "deleteStudent",
         onSuccess: () => {
-            alert(`Event successfully closed`);
+            toast(`Event successfully closed`);
             confirm_delete.value = false;
             form.reset();
         },
@@ -106,193 +118,216 @@ const removeTime = (t) => {
             break;
     }
 };
+
+onMounted(() => {
+    // exportFromJSON({ data, fileName, exportType });
+});
 </script>
 <template>
     <AppLayout title="Students">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Attendance
+                Events
             </h2>
         </template>
-        <div class="py-12">
+        <div class="py-12 mb-5 mx-28">
             <button
-                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 @click="show_add_dialog = true"
+                type="button"
+                data-mdb-ripple="true"
+                data-mdb-ripple-color="light"
+                class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             >
                 Add Events
             </button>
-            <div class="mt-1 overflow-hidden bg-white mb-2">
-                <div class="c overflow-auto">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-fixed"
-                    >
-                        <thead
-                            class="text-xs text-gray-700 uppercase bg-gray-50"
-                        >
-                            <tr>
-                                <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
-                                >
-                                    Event Name
-                                </th>
-                                <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
-                                >
-                                    Starting Date
-                                </th>
-                                <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
-                                >
-                                    End Date
-                                </th>
-                                <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
-                                >
-                                    Status
-                                </th>
 
-                                <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
-                                >
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr
-                                v-for="(student, index) in props.sheets.data"
-                                :key="index"
-                                class="hover:bg-gray-100"
-                            >
-                                <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
-                                >
-                                    {{ student.name }}
-                                </td>
-                                <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
-                                >
-                                    <p
-                                        v-for="(
-                                            st, st_index
-                                        ) in student.start_time"
-                                        :key="st_index"
-                                    >
-                                        {{
-                                            `${st_index + 1}.)  ${moment(
-                                                new Date(st)
-                                            ).format("LLLL")}`
-                                        }}
-                                    </p>
-                                </td>
-                                <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
-                                >
-                                    <p
-                                        v-for="(
-                                            st, st_index
-                                        ) in student.end_time"
-                                        :key="st_index"
-                                    >
-                                        {{
-                                            `${st_index + 1}.)  ${moment(
-                                                new Date(st)
-                                            ).format("LLLL")}`
-                                        }}
-                                    </p>
-                                </td>
-                                <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
-                                >
-                                    {{
-                                        student.status == null
-                                            ? "Open"
-                                            : "Close"
-                                    }}
-                                </td>
-
-                                <td>
-                                    <button
-                                        @click="showEditStudent(student)"
-                                        title="Edit"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            data-v-0e807ea5=""
+            <div class="flex flex-col">
+                <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
+                        <div class="overflow-hidden">
+                            <table class="min-w-full">
+                                <thead class="bg-white border-b">
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                         >
-                                            <path
-                                                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                                                clip-rule="evenodd"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                        </svg>
-                                    </button>
-                                    <button
-                                        @click="showConfirmModal(student)"
-                                        title="Close"
+                                            Event Name
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
+                                            Starting Date
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
+                                            End Date
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
+                                            Status
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                                        >
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        class="border-b bg-white"
+                                        v-for="(student, index) in props.sheets
+                                            .data"
+                                        :key="index"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            data-v-0e807ea5=""
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                         >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                                clip-rule="evenodd"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                        </svg>
-                                    </button>
-                                    <button>
-                                        <a
-                                            title="Reports"
-                                            :href="
-                                                route(
-                                                    'report.index',
-                                                    student.id
-                                                )
-                                            "
+                                            {{ student.name }}
+                                        </td>
+                                        <td
+                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-4 w-5"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                stroke-width="2"
+                                            <div class="flex justify-center">
+                                                <ul
+                                                    class="bg-white rounded-lg w-96 text-gray-900"
+                                                >
+                                                    <li
+                                                        v-for="(
+                                                            st, st_index
+                                                        ) in student.start_time"
+                                                        :key="st_index"
+                                                        class="px-6 py-2 border-b border-gray-200 w-full rounded-t-lg"
+                                                    >
+                                                        {{
+                                                            `${
+                                                                st_index + 1
+                                                            }.)  ${moment(
+                                                                new Date(st)
+                                                            ).format("LLLL")}`
+                                                        }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td
+                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                        >
+                                            <div class="flex justify-center">
+                                                <ul
+                                                    class="bg-white rounded-lg w-96 text-gray-900"
+                                                >
+                                                    <li
+                                                        v-for="(
+                                                            st, st_index
+                                                        ) in student.end_time"
+                                                        :key="st_index"
+                                                        class="px-6 py-2 border-b border-gray-200 w-full rounded-t-lg"
+                                                    >
+                                                        {{
+                                                            `${
+                                                                st_index + 1
+                                                            }.)  ${moment(
+                                                                new Date(st)
+                                                            ).format("LLLL")}`
+                                                        }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td
+                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                        >
+                                            {{
+                                                student.status == null
+                                                    ? "Open"
+                                                    : "Close"
+                                            }}
+                                        </td>
+                                        <td
+                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                        >
+                                            <button
+                                                @click="
+                                                    showEditStudent(student)
+                                                "
+                                                title="Edit"
                                             >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                                                />
-                                            </svg>
-                                        </a>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    v-if="props.sheets.data.length === 0"
-                                    colspan="5"
-                                    class="uppercase py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap text-center"
-                                >
-                                    No result found
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    class="w-6 h-6"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                @click="
+                                                    showConfirmModal(student)
+                                                "
+                                                title="Close"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    class="w-6 h-6"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <button>
+                                                <a
+                                                    title="Reports"
+                                                    :href="
+                                                        route(
+                                                            'report.index',
+                                                            student.id
+                                                        )
+                                                    "
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="1.5"
+                                                        stroke="currentColor"
+                                                        class="w-6 h-6"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"
+                                                        />
+                                                    </svg>
+                                                </a>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -335,18 +370,18 @@ const removeTime = (t) => {
                             type="datetime-local"
                             name="start"
                             id="start"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            class="mb-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             v-model="form.start_date"
                         />
                         <button
                             @click="form.start_time.push(form.start_date)"
-                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            class="mr-1 inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                         >
                             Add
                         </button>
                         <button
                             @click="removeTime('start_time')"
-                            class="ml-1 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                         >
                             Delete
                         </button>
@@ -405,18 +440,18 @@ const removeTime = (t) => {
                             type="datetime-local"
                             name="end"
                             id="end"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            class="mb-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             v-model="form.end_date"
                         />
                         <button
                             @click="form.end_time.push(form.end_date)"
-                            class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            class="mr-1 text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                         >
                             Add
                         </button>
                         <button
                             @click="removeTime('end_time')"
-                            class="ml-1 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-1 px-3 mt-1 mb-1 text-sm font-small text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            class="text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                         >
                             Delete
                         </button>
@@ -533,6 +568,7 @@ const removeTime = (t) => {
                 Cancel
             </JetSecondaryButton>
             <JetPrimaryButton
+                class="text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                 :class="{ 'opacity-25': form?.processing }"
                 :disabled="form?.processing"
                 @click="addStudent"

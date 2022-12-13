@@ -6,9 +6,15 @@ import JetPrimaryButton from "@/Components/PrimaryButton.vue";
 import JetSecondaryButton from "@/Components/SecondaryButton.vue";
 import JetInputError from "@/Components/InputError.vue";
 import JetConfirmModal from "@/Components/ConfirmationModal.vue";
+import { useToast } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 import { ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
 
+const toast = useToast({
+    position: "bottom-right",
+    timeout: 1500,
+});
 const props = defineProps(["students", "course"]);
 const show_add_dialog = ref(false);
 const edit_student = ref(false);
@@ -34,7 +40,7 @@ const addStudent = () => {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
-            alert(
+            toast(
                 `Student successfully ${
                     edit_student.value ? "updated" : "added"
                 }`
@@ -73,7 +79,7 @@ const confirmDelete = () => {
         preserveScroll: true,
         errorBag: "deleteStudent",
         onSuccess: () => {
-            alert(`Student successfully removed`);
+            toast(`Student successfully removed`);
             confirm_delete.value = false;
             form.reset();
         },
@@ -90,120 +96,123 @@ const confirmDelete = () => {
                 Students
             </h2>
         </template>
-        <div class="py-12">
+        <div class="py-12 mb-5 mx-28">
             <button
-                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 @click="show_add_dialog = true"
+                type="button"
+                data-mdb-ripple="true"
+                data-mdb-ripple-color="light"
+                class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             >
                 Add Students
             </button>
-            <div class="mt-1 overflow-hidden bg-white mb-2">
+            <div class="mt-1 overflow-hidden bg-white">
                 <div class="c overflow-auto">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-fixed"
-                    >
-                        <thead
-                            class="text-xs text-gray-700 uppercase bg-gray-50"
-                        >
+                    <table class="min-w-full">
+                        <thead class="bg-white border-b">
                             <tr>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     ID Number
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Name
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Email
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Contact Number
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Address
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Actions
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody>
                             <tr
                                 v-for="(student, index) in props.students.data"
                                 :key="index"
-                                class="hover:bg-gray-100"
+                                class="border-b bg-white"
                             >
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
                                     {{ student.id_number }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{ student.name }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{ student.email }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{ student.phone_number }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{ student.address }}
                                 </td>
-                                <td>
+                                <td
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                >
                                     <button @click="showEditStudent(student)">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            data-v-0e807ea5=""
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="w-6 h-6"
                                         >
                                             <path
-                                                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-                                                data-v-0e807ea5=""
-                                            ></path>
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                                                clip-rule="evenodd"
-                                                data-v-0e807ea5=""
-                                            ></path>
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                                            />
                                         </svg>
                                     </button>
                                     <button @click="showConfirmModal(student)">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            data-v-0e807ea5=""
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="w-6 h-6"
                                         >
                                             <path
-                                                fill-rule="evenodd"
-                                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                                clip-rule="evenodd"
-                                                data-v-0e807ea5=""
-                                            ></path>
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                            />
                                         </svg>
                                     </button>
                                 </td>
@@ -453,6 +462,7 @@ const confirmDelete = () => {
                 Cancel
             </JetSecondaryButton>
             <JetPrimaryButton
+                class="text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                 :class="{ 'opacity-25': form?.processing }"
                 :disabled="form?.processing"
                 @click="addStudent"

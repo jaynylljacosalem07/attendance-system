@@ -47,7 +47,11 @@ const logout = () => {
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
                                 <Link :href="route('home.index')">
-                                    <ApplicationMark class="block h-9 w-auto" />
+                                    <!-- <ApplicationMark class="block h-9 w-auto" /> -->
+                                    <img
+                                        class="max-h-14"
+                                        src="../../../storage/app/public/images/pcc.jpg"
+                                    />
                                 </Link>
                             </div>
 
@@ -82,11 +86,11 @@ const logout = () => {
                                     >Students</NavLink
                                 >
                             </div>
-                            <div
+                            <!-- <div
                                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
                             >
                                 <NavLink>Reports</NavLink>
-                            </div>
+                            </div> -->
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
                             >
@@ -100,6 +104,15 @@ const logout = () => {
 
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
                             <!-- Settings Dropdown -->
+                            <div class="shrink-0 flex items-center">
+                                <Link :href="route('home.index')">
+                                    <!-- <ApplicationMark class="block h-9 w-auto" /> -->
+                                    <img
+                                        class="max-h-14 rounded-full"
+                                        src="../../../storage/app/public/images/csc.jpg"
+                                    />
+                                </Link>
+                            </div>
                             <div class="ml-3 relative">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>

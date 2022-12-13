@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttendanceSheet;
+use App\Models\Course;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,15 +15,17 @@ class ReportsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index($id,Request $request)
     {
         //
         // dd(Event::find($id)->sheets()->get()[0]->course->name);
         // dd(AttendanceSheet::whereEventId($id)->event()->get());
-        
+        // dd(Event::find($id)->sheets()->with('user')->with('course')->get());
         return Inertia::render('Reports/Index',[
             "data" => Event::find($id)->sheets()->with('user')->with('course')->get(),
-            "event" => Event::find($id)
+            "event" => Event::find($id),
+            "course" => Course::all()
+
         ]);
 
     }
@@ -43,12 +46,28 @@ class ReportsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function filter($id,Request $request)
     {
-        //
+     
+        $event = Event::find($id)->sheets()->with('user')->with('course')->get();
+        $filtered = $event->filter(function ($item) use($request) {
+            return in_array($item->user->year_level, $request->year_level);
+        });
+     
+        $filtered =$filtered->filter(function ($item) use($request) {
+            return in_array($item->course->id, $request->course);
+        });
+        // dd( $filtered->values());
+        return Inertia::render('Reports/Index',[
+            "data" =>$filtered->values(),
+            "event" => Event::find($id),
+            "course" => Course::all(),
+            "filtered" =>$filtered->values(),
+
+        ]);
     }
 
-    /**
+    /** 
      * Display the specified resource.
      *
      * @param  int  $id

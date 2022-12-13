@@ -7,11 +7,27 @@ import JetSecondaryButton from "@/Components/SecondaryButton.vue";
 import JetInputError from "@/Components/InputError.vue";
 import JetConfirmModal from "@/Components/ConfirmationModal.vue";
 import Multiselect from "@vueform/multiselect";
+import { useToast } from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
 import moment from "moment";
 import { reactive, ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
+import exportFromJSON from "export-from-json";
 
-const props = defineProps(["data", "event"]);
+const exportType = exportFromJSON.types.csv;
+const fileName = "download";
+const toast = useToast({
+    position: "bottom-right",
+    timeout: 1500,
+});
+
+const props = defineProps(["data", "event", "course", "filtered"]);
+const form = useForm({
+    id: props.event.id,
+    year_level: [],
+    course: [],
+});
 
 const year_levels = reactive([
     { label: "1st Year", value: 1 },
@@ -19,41 +35,180 @@ const year_levels = reactive([
     { label: "3rd Year", value: 3 },
     { label: "4th Year", value: 4 },
 ]);
+const filterReport = () => {
+    form.post(route("report.filter", props.event.id), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            toast("Record updated.");
+            // alert(
+            //     `Event successfully ${edit_student.value ? "updated" : "added"}`
+            // );
+            // if (edit_student.value) edit_student.value = !edit_student.value;
+            // show_add_dialog.value = false;
+            // form.reset();
+        },
+        onError: (e) => {
+            console.log(e);
+        },
+    });
+};
+
+const downloadReport = () => {
+    let obj_data = [];
+    if (typeof props.data == "object") {
+        let ok = Object.keys(props.data);
+        let ov = Object.values(props.data);
+        obj_data = ok.map((item, index) => {
+            let tmp = {};
+            tmp[item] = ov[index];
+            return tmp;
+        });
+    }
+    console.log(obj_data);
+    //set up data for download
+    let fields = ["No.", "Name", "Course", "Year Level"];
+    let data = props.data.map((item, index) => {
+        // console.log(index, item);
+        let in_out = [];
+        let info = {
+            "No.": index + 1,
+            Name: item.user.name,
+            Course: item.course.name,
+            "Year Level": item.user.year_level,
+        };
+        item.in.map((time, t_index) => {
+            let in_f = {};
+            in_f[`In #${t_index + 1}`] = moment(new Date(time)).format("LLLL");
+            in_f[`Out #${t_index + 1}`] =
+                item.out !== null
+                    ? moment(new Date(item.out[t_index])).format("LLLL")
+                    : "";
+            in_out = { ...in_out, ...in_f };
+        });
+        // console.log(in_out);
+        return { ...info, ...in_out };
+    });
+    let keys = Object.keys(props.data);
+    if (keys.length > 0) {
+        let time_in = props.data[keys[0]].in
+            .map((item, index) => {
+                return [`In #${index + 1}`, `Out #${index + 1}`];
+            })
+            .join();
+        fields = fields.concat(time_in.split(","));
+        console.log(fields);
+    }
+    console.log(data);
+    exportFromJSON({ data, fileName, fields, exportType });
+};
 </script>
 <template>
     <AppLayout title="Reports">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Reports
-            </h2>
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item bg-white border border-gray-200">
+                    <h2 class="accordion-header mb-0" id="headingOne">
+                        <button
+                            class="accordion-button relative flex items-center w-full py-4 px-5 text-base text-gray-800 text-left bg-white border-0 rounded-none transition focus:outline-none"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne"
+                            aria-expanded="true"
+                            aria-controls="collapseOne"
+                        >
+                            Filter:
+                        </button>
+                    </h2>
+                    <div
+                        id="collapseOne"
+                        class="accordion-collapse collapse show"
+                        aria-labelledby="headingOne"
+                        data-bs-parent="#accordionExample"
+                    >
+                        <div
+                            class="block p-6 rounded-lg shadow-lg bg-white max-w-full"
+                        >
+                            <div class="form-group mb-6">
+                                <label
+                                    for="exampleInputEmail1"
+                                    class="form-label inline-block mb-2 text-gray-700"
+                                    >Filter By:</label
+                                >
+
+                                <multiselect
+                                    class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                    placeholder="Course"
+                                    mode="tags"
+                                    :options="
+                                        course.map((o) => {
+                                            return {
+                                                label: o.name,
+                                                value: o.id,
+                                            };
+                                        })
+                                    "
+                                    v-model="form.course"
+                                ></multiselect>
+                            </div>
+                            <div class="form-group mb-6">
+                                <multiselect
+                                    class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                    placeholder=" Level"
+                                    mode="tags"
+                                    :options="year_levels"
+                                    v-model="form.year_level"
+                                ></multiselect>
+                            </div>
+                            <div class="flex space-x-2">
+                                <div>
+                                    <button
+                                        class="mr-1 inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+                                        @click="filterReport"
+                                    >
+                                        Filter
+                                    </button>
+
+                                    <button
+                                        class="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+                                        @click="downloadReport"
+                                    >
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </template>
-        <div class="py-12">
+        <div class="py-12 mb-5 mx-28">
             <div class="mt-1 overflow-hidden bg-white mb-2">
                 <div class="c overflow-auto">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-fixed"
-                    >
-                        <thead
-                            class="text-xs text-gray-700 uppercase bg-gray-50"
-                        >
+                    <table class="min-w-full">
+                        <thead class="bg-white border-b">
                             <tr>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     No.
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Name
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Course
                                 </th>
                                 <th
-                                    class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                    scope="col"
+                                    class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                 >
                                     Year Level
                                 </th>
@@ -62,42 +217,44 @@ const year_levels = reactive([
                                     :key="st_index"
                                 >
                                     <th
-                                        class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                        scope="col"
+                                        class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                     >
                                         In #{{ st_index + 1 }}
                                     </th>
 
                                     <th
-                                        class="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                        scope="col"
+                                        class="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                                     >
                                         Out #{{ st_index + 1 }}
                                     </th>
                                 </template>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody>
                             <tr
                                 v-for="(d, index) in data"
                                 :key="index"
-                                class="hover:bg-gray-100"
+                                class="border-b bg-white"
                             >
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
                                     {{ index + 1 }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{ d.user.name }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{ d.course.name }}
                                 </td>
                                 <td
-                                    class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     {{
                                         year_levels.find((o) => {
@@ -106,22 +263,23 @@ const year_levels = reactive([
                                     }}
                                 </td>
                                 <template
-                                    v-for="(st, st_index) in d.in"
+                                    v-for="(st, st_index) in d?.in"
                                     :key="st_index"
                                 >
                                     <td
-                                        class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                        class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                     >
                                         {{
                                             moment(new Date(st)).format("LLLL")
                                         }}
                                     </td>
                                     <td
-                                        class="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap"
+                                        class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                        v-if="d?.out"
                                     >
                                         {{
                                             moment(
-                                                new Date(d.out[st_index])
+                                                new Date(d?.out[st_index])
                                             ).format("LLLL")
                                         }}
                                     </td>
@@ -131,7 +289,7 @@ const year_levels = reactive([
                                 <td
                                     v-if="data.length === 0"
                                     colspan="5"
-                                    class="uppercase py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap text-center"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
                                 >
                                     No result found
                                 </td>

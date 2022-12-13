@@ -3,6 +3,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import JetPrimaryButton from "@/Components/PrimaryButton.vue";
 import JetSecondaryButton from "@/Components/SecondaryButton.vue";
 import JetConfirmModal from "@/Components/ConfirmationModal.vue";
+import { useToast } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 import { useForm } from "@inertiajs/inertia-vue3";
 import { ref } from "@vue/reactivity";
 const props = defineProps(["school", "courses"]);
@@ -13,6 +15,10 @@ const form = useForm({
     website: "",
     email: "",
     logo: "",
+});
+const toast = useToast({
+    position: "bottom-right",
+    timeout: 1500,
 });
 const form_courses = useForm({
     courses: [],
@@ -29,7 +35,7 @@ const saveSettings = () => {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
-            alert(`Setting successfully saved`);
+            toast(`Setting successfully saved`);
             form.reset();
         },
         onError: (e) => {
@@ -44,7 +50,7 @@ const saveCourses = () => {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
-            alert(`Course successfully saved`);
+            toast(`Course successfully saved`);
             form.reset();
         },
         onError: (e) => {
@@ -78,7 +84,7 @@ const confirmDelete = () => {
         preserveScroll: true,
         errorBag: "deleteCourse",
         onSuccess: () => {
-            alert(`Course successfully removed`);
+            toast(`Course successfully removed`);
             confirm_delete.value = false;
             form.reset();
         },
@@ -95,7 +101,7 @@ const confirmDelete = () => {
                 Settings
             </h2>
         </template>
-        <div class="py-12">
+        <div class="py-12 mb-5 mx-28">
             <div>
                 <div class="md:grid md:grid-cols-3 md:gap-6">
                     <div class="md:col-span-1">
@@ -105,10 +111,10 @@ const confirmDelete = () => {
                             >
                                 School Information
                             </h3>
-                            <p class="mt-1 text-sm text-gray-600">
+                            <!-- <p class="mt-1 text-sm text-gray-600">
                                 This information will be displayed publicly so
                                 be careful what you share.
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                     <div class="mt-5 md:col-span-2 md:mt-0">
@@ -177,7 +183,7 @@ const confirmDelete = () => {
                                         </div>
                                     </div>
 
-                                    <div>
+                                    <!-- <div>
                                         <label
                                             class="block text-sm font-medium text-gray-700"
                                             >Photo</label
@@ -210,7 +216,7 @@ const confirmDelete = () => {
                                                 />
                                             </label>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div
                                     class="bg-gray-50 px-4 py-3 text-right sm:px-6"
@@ -218,7 +224,7 @@ const confirmDelete = () => {
                                     <button
                                         @click="saveSettings"
                                         type="submit"
-                                        class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        class="text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                                     >
                                         Save
                                     </button>
@@ -244,10 +250,10 @@ const confirmDelete = () => {
                             >
                                 Courses
                             </h3>
-                            <p class="mt-1 text-sm text-gray-600">
+                            <!-- <p class="mt-1 text-sm text-gray-600">
                                 Use a permanent address where you can receive
                                 mail.
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                     <div class="mt-5 md:col-span-2 md:mt-0">
@@ -273,7 +279,7 @@ const confirmDelete = () => {
                                         <div class="col-span-6">
                                             <button
                                                 @click="addCourseProcess"
-                                                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                class="text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                                             >
                                                 {{
                                                     edit_course
@@ -390,7 +396,7 @@ const confirmDelete = () => {
                                 >
                                     <button
                                         @click="saveCourses"
-                                        class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                        class="text-sm font-small inline-block px-6 py-2.5 bg-blue-600 text-white text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                                     >
                                         Save
                                     </button>

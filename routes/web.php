@@ -21,12 +21,13 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect('home');
+    // return Inertia::render('Dashboard/Index', [
+        // 'canLogin' => Route::has('login'),
+        // 'canRegister' => Route::has('register'),
+        // 'laravelVersion' => Application::VERSION,
+        // 'phpVersion' => PHP_VERSION,
+    // ]);
 });
 
 Route::middleware([
@@ -67,6 +68,7 @@ Route::middleware([
 
     Route::prefix('report')->name('report.')->group(function() {
         Route::get('/{id}', [ReportsController::class, 'index'])->name('index');
+        Route::post('/filter/{id}', [ReportsController::class, 'filter'])->name('filter');
     });
 
 
