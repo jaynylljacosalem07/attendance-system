@@ -156,7 +156,7 @@ const confirmDelete = () => {
                                 class="border-b bg-white"
                             >
                                 <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                    class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
                                     {{ student.id_number }}
                                 </td>
@@ -166,7 +166,7 @@ const confirmDelete = () => {
                                     {{ student.name }}
                                 </td>
                                 <td
-                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-3 py-4 whitespace-pre-wrap"
                                 >
                                     {{ student.email }}
                                 </td>
@@ -176,7 +176,7 @@ const confirmDelete = () => {
                                     {{ student.phone_number }}
                                 </td>
                                 <td
-                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-pre-wrap"
                                 >
                                     {{ student.address }}
                                 </td>

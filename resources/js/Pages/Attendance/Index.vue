@@ -142,7 +142,7 @@ onMounted(() => {
             </button>
 
             <div class="flex flex-col">
-                <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="overflow-x-auto sm:-mx-6 lg:-mx-8 md:-mx-6">
                     <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
                         <div class="overflow-hidden">
                             <table class="min-w-full">
@@ -188,62 +188,60 @@ onMounted(() => {
                                         :key="index"
                                     >
                                         <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                            class="py-3 px-6 text-sm font-medium text-gray-500 whitespace-nowrap"
                                         >
                                             {{ student.name }}
                                         </td>
                                         <td
-                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                            class="py-3 px-6 text-sm font-medium text-gray-500 whitespace-pre-wrapp"
                                         >
-                                            <div class="flex justify-center">
-                                                <ul
-                                                    class="bg-white rounded-lg w-96 text-gray-900"
+                                            <!-- <div class="flex justify-center"> -->
+                                            <ul
+                                                class="bg-white rounded-lg text-gray-900"
+                                            >
+                                                <li
+                                                    v-for="(
+                                                        st, st_index
+                                                    ) in student.start_time"
+                                                    :key="st_index"
                                                 >
-                                                    <li
-                                                        v-for="(
-                                                            st, st_index
-                                                        ) in student.start_time"
-                                                        :key="st_index"
-                                                        class="px-6 py-2 border-b border-gray-200 w-full rounded-t-lg"
-                                                    >
-                                                        {{
-                                                            `${
-                                                                st_index + 1
-                                                            }.)  ${moment(
-                                                                new Date(st)
-                                                            ).format("LLLL")}`
-                                                        }}
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                                    {{
+                                                        `${
+                                                            st_index + 1
+                                                        }.)  ${moment(
+                                                            new Date(st)
+                                                        ).format("LLL")}`
+                                                    }}
+                                                </li>
+                                            </ul>
+                                            <!-- </div> -->
                                         </td>
                                         <td
-                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                            class="py-3 px-6 text-sm font-medium text-gray-500 whitespace-pre-wrap"
                                         >
                                             <div class="flex justify-center">
                                                 <ul
-                                                    class="bg-white rounded-lg w-96 text-gray-900"
+                                                    class="bg-white rounded-lg text-gray-900"
                                                 >
                                                     <li
                                                         v-for="(
                                                             st, st_index
                                                         ) in student.end_time"
                                                         :key="st_index"
-                                                        class="px-6 py-2 border-b border-gray-200 w-full rounded-t-lg"
                                                     >
                                                         {{
                                                             `${
                                                                 st_index + 1
                                                             }.)  ${moment(
                                                                 new Date(st)
-                                                            ).format("LLLL")}`
+                                                            ).format("LLL")}`
                                                         }}
                                                     </li>
                                                 </ul>
                                             </div>
                                         </td>
                                         <td
-                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                            class="py-3 px-6 text-sm font-medium text-gray-500 whitespace-nowrap"
                                         >
                                             {{
                                                 student.status == null
@@ -252,7 +250,7 @@ onMounted(() => {
                                             }}
                                         </td>
                                         <td
-                                            class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                            class="py-3 px-6 text-sm font-medium text-gray-500 whitespace-nowrap"
                                         >
                                             <button
                                                 @click="

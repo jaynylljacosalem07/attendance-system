@@ -239,22 +239,22 @@ const downloadReport = () => {
                                 class="border-b bg-white"
                             >
                                 <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                                    class="px-2 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
                                     {{ index + 1 }}
                                 </td>
                                 <td
-                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-3 py-4 whitespace-nowrap"
                                 >
                                     {{ d.user.name }}
                                 </td>
                                 <td
-                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-3 py-4 whitespace-nowrap"
                                 >
                                     {{ d.course.name }}
                                 </td>
                                 <td
-                                    class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                    class="text-sm text-gray-900 font-light px-3 py-4 whitespace-nowrap"
                                 >
                                     {{
                                         year_levels.find((o) => {
@@ -267,20 +267,18 @@ const downloadReport = () => {
                                     :key="st_index"
                                 >
                                     <td
-                                        class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                        class="text-sm text-gray-900 font-light px-3 py-4 whitespace-pre-wrap"
                                     >
-                                        {{
-                                            moment(new Date(st)).format("LLLL")
-                                        }}
+                                        {{ moment(new Date(st)).format("LLL") }}
                                     </td>
                                     <td
-                                        class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
+                                        class="text-sm text-gray-900 font-light px-3 py-4 whitespace-pre-wrap"
                                         v-if="d?.out"
                                     >
                                         {{
                                             moment(
                                                 new Date(d?.out[st_index])
-                                            ).format("LLLL")
+                                            ).format("LLL")
                                         }}
                                     </td>
                                 </template>
